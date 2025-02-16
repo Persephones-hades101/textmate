@@ -13,7 +13,9 @@ editing text files, along with a clean and user-friendly interface.
 - **Exit**: Close the application.
 - **Scrollable Text Area**: Includes a scrollbar for easy navigation.
 - **Word Wrap**: Text automatically wraps within the editor.
-- **Custom Font Size**: Uses a larger, readable font.
+- **Undo and Redo**: You can do Undo and Redo.
+- **Find all occurrence and replace all feature**: Edit menu where you can find
+  and replace patterns.
 
 ## Installation
 
