@@ -1,3 +1,4 @@
 myenv
 *.txt
 first-tk-prog.py
+__pycache__

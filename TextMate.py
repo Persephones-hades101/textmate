@@ -1,8 +1,12 @@
+from gettext import find
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox as msgbox
 from tkinter import filedialog
+from tkinter import simpledialog
 from pathlib import Path
+
+from TwoDialogBox import get_inputs
 
 
 class TEXT_MATE:
@@ -33,10 +37,16 @@ class TEXT_MATE:
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.root.quit)
 
+        edit_menu = tk.Menu(menu_bar, tearoff=0)
+        edit_menu.add_command(label="Find all occurrence", command=self.find)
+        edit_menu.add_command(label="Find and Replace all",
+                              command=self.find_and_replace_all)
+
         help_menu = tk.Menu(menu_bar, tearoff=0)
         help_menu.add_command(label="About", command=self.show_about)
 
         menu_bar.add_cascade(label='File', menu=file_menu)
+        menu_bar.add_cascade(label='Edit', menu=edit_menu)
         menu_bar.add_cascade(label='Help', menu=help_menu)
 
         # Text Frame inside the root
@@ -44,7 +54,10 @@ class TEXT_MATE:
         text_frame.pack(fill="both", expand=True)
 
         # Text Widget inside the Text frame
-        self.text_area = tk.Text(text_frame, wrap="word", font=("Arial", 16))
+        self.text_area = tk.Text(
+            text_frame, wrap="word", font=("Arial", 16), undo=True)
+        self.text_area.tag_configure(
+            "highlight", background="yellow", foreground="black")
         self.text_area.pack(side='left', fill="both",
                             expand=True, padx=5, pady=5)
 
@@ -102,6 +115,41 @@ class TEXT_MATE:
         self.text_area.delete("1.0", "end")
         self.text_area.insert("end", content)
         self.root.title(file_name.name)
+
+    def find(self):
+        self.text_area.tag_remove("highlight", "1.0", "end")
+        pattern = simpledialog.askstring("Find", "Enter the text to find:")
+        if not pattern:
+            return
+        pattern_len = len(pattern)
+        start_pos = "1.0"
+        while True:
+            start_pos = self.text_area.search(pattern, start_pos, "end")
+            if not start_pos:
+                break
+            line, char = start_pos.split(".")
+            end_char = int(char) + pattern_len
+            end_pos = f"{line}.{end_char}"
+            self.text_area.tag_add("highlight", start_pos, end_pos)
+            start_pos = end_pos
+
+    def find_and_replace_all(self):
+        # pattern = simpledialog.askstring(
+        #     "Find and replace", "Enter the text to find:")
+        result = get_inputs(self.root)
+        pattern = result[0]
+        replacement = result[1]
+        pattern_len = len(pattern)
+        start_pos = "1.0"
+        while True:
+            start_pos = self.text_area.search(pattern, start_pos, "end")
+            if not start_pos:
+                break
+            line, char = start_pos.split(".")
+            end_char = int(char) + pattern_len
+            end_pos = f"{line}.{end_char}"
+            self.text_area.delete(start_pos, end_pos)
+            self.text_area.insert(start_pos, replacement)
 
 
 TEXT_MATE()
